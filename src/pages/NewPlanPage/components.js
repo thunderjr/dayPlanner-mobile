@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { View, Text, TouchableOpacity } from 'react-native';
 import styled from 'styled-components/native';
 
@@ -34,44 +34,16 @@ export const Input = styled.TextInput`
     letter-spacing: -1.45px;
 `;
 
-// date and time picker wrappers
-export const DateTimeRow = styled.View`
+// time picker wrapper
+export const TimeRow = styled.View`
     flex-direction: row;
-    margin-top: 15px;
-`;
-
-export const DateWrapper = styled.View`
-    flex: 2;
-    margin-right: 10px;
+    margin-vertical: 15px;
 `;
 
 export const TimeWrapper = styled.View`
     flex: 1;
     ${props => (props.last) ? '' : 'margin-right: 10px;' }
 `;
-
-// date toggle
-const _DateToggle = styled.TouchableOpacity`
-    border-bottom-width: 2px;
-    border-bottom-color: #333;
-    margin-top: 5px;
-    margin-bottom: 20px;
-    letter-spacing: -1.45px;
-`;
-
-const DateValue = styled.Text`
-    font-size: 20px;
-    padding-right: 5px;
-    text-align: center;
-`;
-
-export const DateToggle = ({ onPress, value }) => {
-    return (
-        <_DateToggle onPress={onPress}>
-            <DateValue>{ value.toLocaleDateString('pt-BR') }</DateValue>
-        </_DateToggle>
-    );
-}
 
 // time toggle
 const _TimeToggle = styled.TouchableOpacity`
@@ -84,8 +56,7 @@ const _TimeToggle = styled.TouchableOpacity`
 
 const TimeValue = styled.Text`
     font-size: 20px;
-    padding-right: 5px;
-    
+    padding-right: 5px;    
     text-align: center;
 `;
 
@@ -112,6 +83,43 @@ const _DayCircle = styled.View`
     justify-content: center;
 `;
 
+const _ShortcutPill = styled.View`
+    border-radius: 50;
+    padding-vertical: 8px;
+    padding-horizontal: 15px;
+    margin: 2px;
+    background-color: ${props => (props.active) ? '#1A649C': '#EEE' };
+    align-items: center;
+    justify-content: center;
+`;
+
+const WeekdayShortcut = ({ type, selected, setSelected }) => {
+    let active;
+    if (type == 'workdays') {
+        active = selected.includes('Mon') && selected.includes('Tue') && selected.includes('Wed') && selected.includes('Thu') && selected.includes('Fri') && !selected.includes('Sat') && !selected.includes('Sun');
+    } else if (type == 'weekend') {
+        active = !selected.includes('Mon') && !selected.includes('Tue') && !selected.includes('Wed') && !selected.includes('Thu') && !selected.includes('Fri') && selected.includes('Sat') && selected.includes('Sun');
+    }
+
+    const handleClick = () => {
+        if (type == 'workdays') {
+            setSelected(['Mon','Tue','Wed','Thu','Fri']);
+        } else if (type == 'weekend') {
+            setSelected(['Sat','Sun']);
+        }
+    }
+
+    return (
+        <TouchableOpacity onPress={handleClick}>
+            <_ShortcutPill active={active}>
+                <Text style={{ color: (active) ? 'white' : 'black', fontSize: 17 }}>
+                    { (type == 'workdays') ? 'Dias da Semana' : 'Fim de Semana' }
+                </Text>
+            </_ShortcutPill>
+        </TouchableOpacity>
+    );
+}
+
 const DayCircle = ({ day, letter, selected, setSelected }) => {
     const handleClick = () => {
         if (selected.includes(day)) {
@@ -132,8 +140,7 @@ const DayCircle = ({ day, letter, selected, setSelected }) => {
     );
 }
 
-export const WeekdaysPicker = () => {
-    const [selected, setSelected] = useState(['Mon','Tue','Wed','Thu','Fri']);
+export const WeekdaysPicker = ({ selected, setSelected }) => {
     const days = [
         { name: 'Mon', letter: 'S' },
         { name: 'Tue', letter: 'T' },
@@ -145,15 +152,22 @@ export const WeekdaysPicker = () => {
     ];
 
     return (
-        <View style={{flexDirection: 'row'}}>
-            { days.map(day => (
-                <DayCircle
-                    day={day.name}
-                    letter={day.letter}
-                    selected={selected}
-                    setSelected={setSelected}
-                />
-            )) }
-        </View>
+        <>
+            <View style={{flexDirection: 'row'}}>
+                { days.map(day => (
+                    <DayCircle
+                        key={day.name}
+                        day={day.name}
+                        letter={day.letter}
+                        selected={selected}
+                        setSelected={setSelected}
+                    />
+                )) }
+            </View>
+            <View style={{flexDirection: 'row', marginTop: 10}}>
+                <WeekdayShortcut type='workdays' selected={selected} setSelected={setSelected} />
+                <WeekdayShortcut type='weekend' selected={selected} setSelected={setSelected} />
+            </View>
+        </>
     );
 }

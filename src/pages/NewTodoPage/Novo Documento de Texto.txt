@@ -1,0 +1,44 @@
+export const DateWrapper = styled.View`
+    flex: 2;
+    margin-right: 10px;
+`;
+
+// date toggle
+const _DateToggle = styled.TouchableOpacity`
+    border-bottom-width: 2px;
+    border-bottom-color: #333;
+    margin-top: 5px;
+    margin-bottom: 20px;
+    letter-spacing: -1.45px;
+`;
+
+const DateValue = styled.Text`
+    font-size: 20px;
+    padding-right: 5px;
+    text-align: center;
+`;
+
+export const DateToggle = ({ onPress, value }) => {
+    return (
+        <_DateToggle onPress={onPress}>
+            <DateValue>{ value.toLocaleDateString('pt-BR') }</DateValue>
+        </_DateToggle>
+    );
+}
+
+
+
+
+
+
+const [dateValue, setDateValue] = useState(new Date());
+const [dateShow, setDateShow] = useState(false);
+const onChangeDate = (e, date) => { setDateShow(false); setDateValue(date) }
+
+const formatedDate = d => d.toLocaleDateString('pt-BR');
+
+<DateWrapper>
+    <InputLabel size={17}>Data:</InputLabel>
+    <DateToggle onPress={() => setDateShow(true)} value={dateValue} />
+    {dateShow && (<DateTimePicker mode="date" value={dateValue} onChange={onChangeDate} />)}
+</DateWrapper>

@@ -1,9 +1,14 @@
 import React, { useState, useEffect } from 'react';
 import { View } from 'react-native';
 
+import { Snackbar } from 'react-native-paper';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { MaterialIcons } from '@expo/vector-icons';
 
+import moment from 'moment';
+import 'moment/locale/pt-br';
+
+import api from './../../services/api';
 import { BackButton } from './../../components';
 import { 
     Input,
@@ -11,32 +16,48 @@ import {
     Header,
     HeaderText,
     FormBody,
-    DateTimeRow,
-    DateWrapper,
+    TimeRow,
     TimeWrapper,
-    DateToggle,
     TimeToggle,
     WeekdaysPicker
 } from './components';
 
 export default function NewPlanPage({ navigator }) {
-    const [dateValue, setDateValue] = useState(new Date());
+    const [selectedDays, setSelectedDays] = useState(['Mon','Tue','Wed','Thu','Fri']);
+
+    const [name, setName] = useState('');
     const [startTimeValue, setStartTimeValue] = useState(new Date());
     const [endTimeValue, setEndTimeValue] = useState(new Date());
     
-    const [dateShow, setDateShow] = useState(false);
     const [startTimeShow, setStartTimeShow] = useState(false);
     const [endTimeShow, setEndTimeShow] = useState(false);
 
-    const onChangeDate = (e, date) => { setDateShow(false); setDateValue(date) }
+    const [snackBarShow, setSnackBarShow] = useState(false);
+    const [snackBarMessage, setSnackBarMessage] = useState('SnackBar');
+    const showSnackBar = message => { setSnackBarShow(true); setSnackBarMessage(message) }
+
     const onChangeStartTime = (e, time) => { setStartTimeShow(false); setStartTimeValue(time) }
     const onChangeEndTime = (e, time) => { setEndTimeShow(false); setEndTimeValue(time) }
 
-    const formatedDate = d => d.toLocaleDateString('pt-BR');
-    const formatedTime = t => t.toLocaleTimeString('pt-BR').split(':').splice(0, 2).join(':');
+
+    const handleSubmit = async () => {
+        const data = { 
+            nome: name,
+            startHora: moment(startTimeValue).format('LT'),
+            endHora: moment(endTimeValue).format('LT'),
+            repeatOn: selectedDays.toString()
+        };
+
+        try {
+            await api.post('/plans/new', data);
+            showSnackBar('Plano adicionado!')
+        } catch (e) {
+            showSnackBar('Não foi possível adicionar o plano!')
+        }
+    }
 
     return (
-        <View style={{marginTop:10}}>
+        <View style={{marginTop: 10, flex: 1}}>
             <BackButton navigator={navigator} backTo="list" />
             <Header>
                 <HeaderText>Adicionar novo Plano</HeaderText>
@@ -44,15 +65,9 @@ export default function NewPlanPage({ navigator }) {
 
             <FormBody>
                 <InputLabel>Nome:</InputLabel>
-                <Input />
+                <Input onChangeText={t => setName(t)} value={name} />
 
-                <DateTimeRow>
-                    <DateWrapper>
-                        <InputLabel size={17}>Data:</InputLabel>
-                        <DateToggle onPress={() => setDateShow(true)} value={dateValue} />
-                        {dateShow && (<DateTimePicker mode="date" value={dateValue} onChange={onChangeDate} />)}
-                    </DateWrapper>
-
+                <TimeRow>
                     <TimeWrapper>
                         <InputLabel size={17}>Início:</InputLabel>
                         <TimeToggle onPress={() => setStartTimeShow(true)} value={startTimeValue} />
@@ -64,11 +79,23 @@ export default function NewPlanPage({ navigator }) {
                         <TimeToggle onPress={() => setEndTimeShow(true)} value={endTimeValue} />
                         {endTimeShow && (<DateTimePicker mode="time" value={endTimeValue} onChange={onChangeEndTime} />)}
                     </TimeWrapper>
-                </DateTimeRow>
+                </TimeRow>
+                
                 <View style={{alignItems: 'center'}}>
-                    <WeekdaysPicker />
+                    <WeekdaysPicker selected={selectedDays} setSelected={setSelectedDays} />
                 </View>
+
+                <MaterialIcons.Button name="done" onPress={handleSubmit} size={30}>
+                    Adicionar
+                </MaterialIcons.Button>
             </FormBody>
+            <Snackbar
+                visible={snackBarShow}
+                duration={5000}
+                onDismiss={() => setSnackBarShow(false)}
+            >
+                {snackBarMessage}
+            </Snackbar>
         </View>
     );
 }

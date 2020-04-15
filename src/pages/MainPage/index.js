@@ -1,10 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { MaterialIcons } from '@expo/vector-icons';
 
 import api from './../../services/api';
-
 import { Container, ListPage } from './components';
-
 import NewPlanPage from './../NewPlanPage';
 
 export default function MainPage() {
@@ -20,11 +17,7 @@ export default function MainPage() {
             setTodayPlans(response.data.plans);
         } catch(e) {}
     }
-    
-    useEffect(() => {
-        getTodayData();
-    }, []);
-
+ 
     return (
         <Container>            
             { (actualPage == 'list') ? <ListPage data={todayPlans} getData={getTodayData} navigator={setActualPage} /> : [] }

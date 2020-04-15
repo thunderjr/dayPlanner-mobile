@@ -49,17 +49,10 @@ export default function App() {
                 }}
                 activeDotColor="#333"
                 loop={false}
+                index={1}
             >
-                <Swiper 
-                    dot={<></>}
-                    activeDot={<></>}
-                    loop={false}
-                    horizontal={false}
-                    loadMinimal={true}
-                >
-                    <MainPage />
-                    <SettingsPage />
-                </Swiper>
+                <SettingsPage />
+                <MainPage />
                 <TradesPage />
             </Swiper>
         </Container>
