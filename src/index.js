@@ -1,15 +1,21 @@
 import React, { useState, useEffect } from 'react';
-import { Container, Header, HeaderText, HeaderSubText} from './components';
+import { Container, Header, HeaderText, HeaderSubText } from './components';
 import Swiper from 'react-native-swiper';
 
 import moment from 'moment';
 import 'moment/locale/pt-br';
+
+import api from './services/api';
 
 import MainPage from './pages/MainPage';
 import SettingsPage from './pages/SettingsPage';
 import TradesPage from './pages/TradesPage';
 
 export default function App() {
+    const [todayData, setTodayData] = useState({});
+    const [todayPlans, setTodayPlans] = useState([]);
+    
+    const [actualPage, setActualPage] = useState('list'); // on MainPage
     const [greetings, setGreetings] = useState([]);
 
     const getDate = () => {
@@ -28,7 +34,16 @@ export default function App() {
         setGreetings(fullGreeting);
     }
 
+    const getTodayData = async () => {
+        try {
+            const response = await api.get('/plans/today');
+            setTodayData(response.data);
+            setTodayPlans(response.data.plans);
+        } catch(e) {}
+    }
+
     useEffect(() => {
+        getTodayData();
         getDate();
     }, [])
 
@@ -40,8 +55,6 @@ export default function App() {
             </Header>
 
             <Swiper
-                // dot={<></>}
-                // activeDot={<></>}
                 paginationStyle={{
                     position: 'absolute',
                     top: 0,
@@ -52,7 +65,7 @@ export default function App() {
                 index={1}
             >
                 <SettingsPage />
-                <MainPage />
+                <MainPage todayPlans={todayPlans} getData={getTodayData} actualPage={actualPage} setActualPage={setActualPage} />
                 <TradesPage />
             </Swiper>
         </Container>

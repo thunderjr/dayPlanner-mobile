@@ -18,7 +18,7 @@ export const Container = styled.View`
 
 export const Header = styled.View`
     padding: 10px;
-    margin-bottom: 15px;
+    margin-bottom: 10px;
 `;
 
 export const HeaderText = styled.Text`

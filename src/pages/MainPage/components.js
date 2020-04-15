@@ -1,6 +1,6 @@
 import React, { useState, useEffect, Fragment } from 'react';
 
-import { View, Text, FlatList } from 'react-native';
+import { View, Text, FlatList, TouchableOpacity } from 'react-native';
 import styled from 'styled-components/native';
 
 import { MaterialIcons } from '@expo/vector-icons';
@@ -36,16 +36,27 @@ const PlanTile = styled.TouchableOpacity`
     padding: 12px 8px;
 `;
 
-const ActionTile = styled.TouchableOpacity`
-    padding: 10px 8px;    
-    align-items: center;
+const Actions = styled.View`
     flex-direction: row;
+    justify-content: space-evenly;
+    padding-top: 5px;
+`;
+
+const ActionPill = styled.View`
+    background-color: ${props => (props.active) ? '#1A649C': '#EEE' };
+    flex-direction: row;
+    border-radius: 50;
+    padding-vertical: 8px;
+    padding-horizontal: 10px;
+    margin-horizontal: 2px;
+    align-items: center;
+    justify-content: center;
 `;
 
 const ActionText = styled.Text`
-    font-size: 20px;
-    margin-left: 10px;
+    margin-left: 2px;
 `;
+
 
 const renderPlans = ({ item }) => {
     return(<>
@@ -75,20 +86,26 @@ export const ListPage = ({ data, getData, navigator }) => {
             />
             
             <Separator />
-            
-            <ActionTile onPress={() => navigator('newPlan')}>
-                <MaterialIcons name="add" size={30} />
-                <ActionText>
-                    Adicionar novo plano...
-                </ActionText>
-            </ActionTile>
 
-            <ActionTile onPress={getData}>
-                <MaterialIcons name="update" size={30} />
-                <ActionText>
-                    Atualizar Dados...
-                </ActionText>
-            </ActionTile>
+            <Actions>
+                <TouchableOpacity onPress={() => navigator('newPlan')}>
+                    <ActionPill>
+                        <MaterialIcons name="add" size={20} />
+                        <ActionText>
+                            Adicionar novo plano
+                        </ActionText>
+                    </ActionPill>
+                </TouchableOpacity>
+
+                <TouchableOpacity onPress={() => navigator('newPlan')}>
+                    <ActionPill>
+                        <MaterialIcons name="add" size={20} />
+                        <ActionText>
+                            Adicionar nova tarefa
+                        </ActionText>
+                    </ActionPill>
+                </TouchableOpacity>
+            </Actions>
         </View>
     );
 }
