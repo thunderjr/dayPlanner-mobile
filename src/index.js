@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Container, Header, HeaderText, HeaderSubText } from './components';
+import { Container, Header } from './components';
 import Swiper from 'react-native-swiper';
 
 import moment from 'moment';
@@ -14,8 +14,14 @@ import TradesPage from './pages/TradesPage';
 export default function App() {
     const [todayData, setTodayData] = useState({});
     const [todayPlans, setTodayPlans] = useState([]);
+
+    const [pages, setPages] = useState({
+        main: 'list', // plans
+        settings: 'main'
+    }); // on cards
+    const navigator = (tab, page) => setPages({ ...pages, [tab]: page });
     
-    const [actualPage, setActualPage] = useState('list'); // on MainPage
+    const [swiperIndex, setSwiperIndex] = useState(1);
     const [greetings, setGreetings] = useState([]);
 
     const getDate = () => {
@@ -42,6 +48,10 @@ export default function App() {
         } catch(e) {}
     }
 
+    const settingsActions = {
+        updateApiData: getTodayData,
+    }
+
     useEffect(() => {
         getTodayData();
         getDate();
@@ -49,11 +59,7 @@ export default function App() {
 
     return (<>
         <Container>
-            <Header>
-                <HeaderText>{ greetings[0] }</HeaderText>
-                <HeaderSubText>{ greetings[1] }</HeaderSubText>
-            </Header>
-
+            <Header swiperIndex={swiperIndex} pages={pages} greetings={greetings} navigator={navigator} />
             <Swiper
                 paginationStyle={{
                     position: 'absolute',
@@ -63,9 +69,10 @@ export default function App() {
                 activeDotColor="#333"
                 loop={false}
                 index={1}
+                onIndexChanged={i => setSwiperIndex(i)}
             >
-                <SettingsPage />
-                <MainPage todayPlans={todayPlans} getData={getTodayData} actualPage={actualPage} setActualPage={setActualPage} />
+                <SettingsPage actualPage={pages.settings} navigator={page => navigator('settings', page)} actions={settingsActions} />
+                <MainPage todayPlans={todayPlans} getData={getTodayData} actualPage={pages.main} navigator={page => navigator('main', page)} />
                 <TradesPage />
             </Swiper>
         </Container>

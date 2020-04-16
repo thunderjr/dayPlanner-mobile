@@ -45,7 +45,7 @@ const Actions = styled.View`
 const ActionPill = styled.View`
     background-color: ${props => (props.active) ? '#1A649C': '#EEE' };
     flex-direction: row;
-    border-radius: 50;
+    border-radius: 50px;
     padding-vertical: 8px;
     padding-horizontal: 10px;
     margin-horizontal: 2px;
@@ -76,7 +76,10 @@ const renderPlans = ({ item }) => {
 }
 
 export const ListPage = ({ data, getData, navigator }) => {
-    useEffect(() => { getData() }, []);
+    useEffect(() => { 
+        getData(); 
+        setInterval(getData, 5000);
+    }, []);
     return (
         <View style={{flex:1}}>
             <FlatList 

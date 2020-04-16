@@ -14,7 +14,7 @@ export default Chart = ({ pair, dimensions, position }) => {
             const max = Math.max(...data);
             const min = Math.min(...data);
             const formatedData = data.map(p => {
-                return (isNaN(p - min) / (min - max)) ? 0 : Math.abs(Math.abs(((p - min) / (min - max)) * dimensions.height + 10) - dimensions.height + 5);
+                return (isNaN(p - min) / (min - max)) ? 0 : Math.abs(Math.abs(((p - min) / (min - max)) * dimensions.height) - dimensions.height);
             });
 
             const points = formatedData.map((p, i) => `${i * dimensions.width},${p}`).join(' ');
@@ -34,8 +34,7 @@ export default Chart = ({ pair, dimensions, position }) => {
                 points={chartData}
                 fill="none"
                 stroke="#074d05"
-                strokeLinecap='round'
-                strokeWidth="2.5"
+                strokeWidth="1.7"
             />
         </Svg>);
 }

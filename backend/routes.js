@@ -85,12 +85,8 @@ routes.get("/plans/get", (request, response) => {
 });
 
 routes.post("/plans/new", (request, response) => {
-    let { nome, startHora, endHora, repeatOn } = request.body;
-
-    if (repeatOn == 'weekdays') { repeatOn = 'Mon,Tue,Wed,Thu,Fri' }
-    if (repeatOn == 'weekend') { repeatOn = 'Sat,Sun' }
-
-    const insertQuery = `INSERT INTO plans (nome, startHora, endHora, repeatOn) VALUES ('${nome}','${startHora}','${endHora}','${repeatOn}')`;
+    const { nome, startHora, endHora, repeatOn } = request.body;
+    const insertQuery = `INSERT INTO plans (nome, startHora, endHora, repeatOn) VALUES ('${nome}', '${startHora}', ${(endHora === null) ? 'NULL' : `'${endHora}'`}, '${repeatOn}')`;
     con.query(insertQuery, (err, results) => {
         if (err) throw err;
         response.send()

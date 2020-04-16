@@ -12,27 +12,52 @@ export const Container = styled.View`
     background-color: #F6F6F6;
 `;
 
-// background-color: #fff;
-//     border-radius: 2px;
-//     elevation: 3;
-
-export const Header = styled.View`
+const HeaderBox = styled.View`
     padding: 10px;
-    margin-bottom: 10px;
+    justify-content: center;
+    height: 100px;
 `;
 
-export const HeaderText = styled.Text`
+const HeaderText = styled.Text`
     font-size: 32px;
     line-height: 40px;
+    ${props => (props.center) ? 'text-align: center;' : '' }
 `;
 
-export const HeaderSubText = styled.Text`
+const HeaderSubText = styled.Text`
     font-size: 26px;
     line-height: 40px;
 `;
 
-export const BackButton = ({ navigator, backTo }) => (
-    <TouchableOpacity onPress={() => navigator(backTo)} style={{position: 'absolute', top: -10, left: -8}}>
-        <MaterialIcons name="navigate-before" size={35} />
-    </TouchableOpacity>
-);
+export const Header = ({ swiperIndex, pages, greetings, navigator }) => {
+    // default
+    let content = (
+        <HeaderBox style={{ paddingLeft: 20 }}>
+            <HeaderText>{ greetings[0] }</HeaderText>
+            <HeaderSubText>{ greetings[1] }</HeaderSubText>
+        </HeaderBox>
+    );
+
+    if (swiperIndex == 1 && pages.main == 'newPlan') {
+        content = (
+            <HeaderBox>
+                <HeaderText center={true}>Adicionar Novo Plano</HeaderText>
+            </HeaderBox>
+        );
+    } else if (swiperIndex == 0 && pages.settings == 'main') {
+        content = (
+            <HeaderBox>
+                <HeaderText center={true}>Configurações e Atalhos</HeaderText>
+            </HeaderBox>
+        );
+    } else if (swiperIndex == 2) {
+        content = (
+            <HeaderBox style={{ paddingLeft: 20 }}>
+                <HeaderText>Portifólio</HeaderText>
+                <HeaderSubText>Criptomoedas</HeaderSubText>
+            </HeaderBox>
+        );
+    }
+
+    return content;
+}
