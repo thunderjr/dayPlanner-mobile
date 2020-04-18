@@ -91,4 +91,35 @@ routes.post("/plans/new", (request, response) => {
     });
 });
 
+routes.put("/plans/:id", (request, response) => {
+    const { id } = request.params;
+    const { nome, startHora, endHora, repeatOn, active } = request.body;
+    if (id != undefined) {
+        // if any isn't undefined
+        if (!(nome == undefined && startHora == undefined && endHora == undefined && repeatOn == undefined && active == undefined)) {
+            const values = [];
+            
+            if (nome != undefined) values.push(`nome='${nome}'`);
+            if (startHora != undefined) values.push(`startHora='${startHora}'`);
+            if (endHora != undefined && endHora !== "null") values.push(`endHora='${endHora}'`);
+            if (endHora === "null") values.push(`endHora=NULL`);
+            if (repeatOn != undefined) values.push(`repeatOn='${repeatOn}'`);
+            if (active != undefined) values.push(`active='${active}'`);
+            
+            const updateQuery = `UPDATE plans SET ${values.join(',')} WHERE id=${id}`;
+
+            console.log(updateQuery)
+
+            con.query(updateQuery, (err, results) => {
+                if (err) throw err;
+                response.status(204).send();
+            });
+        } else {
+            response.status(400).send();
+        }
+    } else {
+        response.status(400).send();
+    }
+})
+
 module.exports = routes;

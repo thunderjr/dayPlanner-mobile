@@ -119,7 +119,7 @@ export default function NewPlanPage({ navigator }) {
                     <ActionButtonText>Adicionar</ActionButtonText>
                 </ActionButton>
             </View>
-            <Snackbar visible={snackBarShow} duration={5000} onDismiss={() => setSnackBarShow(false)}>{snackBarMessage}</Snackbar>
+            <Snackbar visible={snackBarShow} duration={2000} onDismiss={() => setSnackBarShow(false)}>{snackBarMessage}</Snackbar>
         </View>
     );
 }

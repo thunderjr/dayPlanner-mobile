@@ -25,16 +25,18 @@ import {
     ActionButtonText
 } from './components';
 
+const usePlansData = data => ({
+    name: data.nome,
+    selectedDays: data.repeatOn.split(','),
+    startTimeValue: new Date(moment(data.startHora, 'HH:mm')),
+    endTimeValue: (data.endHora != null) ? new Date(moment(data.endHora, 'HH:mm')) : new Date(moment(data.startHora, 'HH:mm').add(1, 'hours')),
+    switchStartEnd: data.endHora != null,
+    active: data.active
+});
+
 export default function PlanPage({ planId, data, navigator }) {
     const planData = data.filter(p => p.id == planId)[0];
-    const toState = {
-        name: planData.nome,
-        selectedDays: planData.repeatOn.split(','),
-        startTimeValue: new Date(moment(planData.startHora, 'HH:mm')),
-        endTimeValue: (planData.endHora != null) ? new Date(moment(planData.endHora, 'HH:mm')) : new Date(moment(planData.startHora, 'HH:mm').add(1, 'hours')),
-        switchStartEnd: planData.endHora != null,
-        active: planData.active
-    };
+    let [toState, setStateData] = useState(usePlansData(planData));
 
     // mutable values - watch changes
     const [name, setName] = useState(toState.name);
@@ -57,10 +59,12 @@ export default function PlanPage({ planId, data, navigator }) {
         )
     }, [name, selectedDays, startTimeValue, endTimeValue, switchStartEnd, switchActive]);
 
+    // api data effect
+    useEffect(() => {
+        setStateData(usePlansData(planData));
+    }, [data]);
+
     // time pickers
-    
-    // fix datetimepicker bug
-    
     const [startTimeShow, setStartTimeShow] = useState(false);
     const [endTimeShow, setEndTimeShow] = useState(false);
     const onChangeStartTime = (e, time) => setStartTimeValue(time || startTimeValue);
@@ -73,12 +77,14 @@ export default function PlanPage({ planId, data, navigator }) {
 
     const handleSubmit = async () => {
         try {
-            await api.post(`/plans/update/${planId}`, {
+            await api.put(`/plans/${planId}`, {
                 nome: name,
                 startHora: moment(startTimeValue).format('LT'),
-                endHora: (switchStartEnd) ? moment(endTimeValue).format('LT') : null,
-                repeatOn: selectedDays.toString()
+                endHora: (switchStartEnd) ? moment(endTimeValue).format('LT') : 'null',
+                repeatOn: selectedDays.toString(),
+                active: switchActive
             });
+            setShouldSendUpdate(false);
             showSnackBar('Plano atualizado!')
         } catch (e) {
             showSnackBar('Não foi possível atualizar o plano!')
@@ -148,7 +154,7 @@ export default function PlanPage({ planId, data, navigator }) {
                     </ActionButton>
                 }
             </View>
-            <Snackbar visible={snackBarShow} duration={5000} onDismiss={() => setSnackBarShow(false)}>{snackBarMessage}</Snackbar>
+            <Snackbar visible={snackBarShow} duration={2000} onDismiss={() => setSnackBarShow(false)}>{snackBarMessage}</Snackbar>
         </View>
     );
 }
