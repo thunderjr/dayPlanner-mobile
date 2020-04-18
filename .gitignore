@@ -10,6 +10,7 @@ npm-debug.*
 *.orig.*
 web-build/
 web-report/
+/backend/connection.js
 
 # macOS
 .DS_Store

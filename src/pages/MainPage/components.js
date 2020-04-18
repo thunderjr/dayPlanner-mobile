@@ -57,34 +57,32 @@ const ActionText = styled.Text`
     margin-left: 2px;
 `;
 
-
-const renderPlans = ({ item }) => {
-    return(<>
-        <PlanTile activeOpacity={0.5} onPress={() => {}}>
-            <>
-                <PlanTitle>{ item.nome }</PlanTitle>
-                <PlanTime>
-                    <MaterialIcons name="watch-later" size={20} color="#050505" />
-                    <PlanTimeText>
-                        { item.startHora }{ (item.endHora !== null) ? ` - ${item.endHora}` : `` }
-                    </PlanTimeText>
-                </PlanTime>
-            </>
-        </PlanTile>
-        <Separator />
-    </>);
-}
+const renderPlans = (navigator, item) => (!item.active) ? null : (<>
+    <PlanTile activeOpacity={0.5} onPress={() => navigator(`plan-${item.id}`)}>
+        <>
+            <PlanTitle>{ item.nome }</PlanTitle>
+            <PlanTime>
+                <MaterialIcons name="watch-later" size={20} color="#050505" />
+                <PlanTimeText>
+                    { item.startHora }{ (item.endHora !== null) ? ` - ${item.endHora}` : `` }
+                </PlanTimeText>
+            </PlanTime>
+        </>
+    </PlanTile>
+    <Separator />
+</>);
 
 export const ListPage = ({ data, getData, navigator }) => {
     useEffect(() => { 
-        getData(); 
+        getData();
         setInterval(getData, 5000);
     }, []);
+
     return (
         <View style={{flex:1}}>
             <FlatList 
                 data={data}
-                renderItem={renderPlans}
+                renderItem={({ item }) => renderPlans(navigator, item)}
                 keyExtractor={item => `plan-${item.id}`}
             />
             

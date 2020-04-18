@@ -1,13 +1,20 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, TouchableOpacity } from 'react-native';
 import styled from 'styled-components/native';
 
 import moment from 'moment';
 import 'moment/locale/pt-br';
 
+export const useStateWithCallback = (initialState, callback) => {
+  const [state, setState] = useState(initialState);
+
+  useEffect(() => callback(state), [state, callback]);
+
+  return [state, setState];
+};
+
 export const FormBody = styled.View`
     flex: 1;
-    margin-top: 20px;
     padding-horizontal: 10px;
 `;
 
@@ -30,7 +37,7 @@ export const Input = styled.TextInput`
 
 // switch end time
 export const SwitchGroup = styled.View`
-    margin-bottom: 40px;
+    margin-bottom: 20px;
     flex-direction: row;
 `;
 
@@ -51,6 +58,7 @@ export const TimeWrapper = styled.View`
 `;
 
 export const ActionButton = styled.TouchableOpacity`
+    flex: 1;
     background-color: #333;    
     ${props => (props.outline) 
         ? `background-color: white
@@ -63,7 +71,7 @@ export const ActionButton = styled.TouchableOpacity`
     border-radius: 3px;
     flex-direction: row;
     padding: 10px;
-    width: 45%;
+    margin-horizontal: 5px;
 `;
 
 export const ActionButtonText = styled.Text`
@@ -98,7 +106,7 @@ const _DayCircle = styled.View`
     justify-content: center;
 `;
 
-const _ShortcutPill = styled.View`
+const ShortcutPill = styled.View`
     border-radius: 50px;
     padding-vertical: 8px;
     padding-horizontal: 15px;
@@ -120,14 +128,14 @@ const WeekdayShortcut = ({ type, selected, setSelected }) => {
                         ? selected.includes('Mon') && selected.includes('Tue') && selected.includes('Wed') && selected.includes('Thu') && selected.includes('Fri') && !selected.includes('Sat') && !selected.includes('Sun')
                         : !selected.includes('Mon') && !selected.includes('Tue') && !selected.includes('Wed') && !selected.includes('Thu') && !selected.includes('Fri') && selected.includes('Sat') && selected.includes('Sun');
 
-    const handleClick = () => setSelected((type == 'workdays') ? ['Mon','Tue','Wed','Thu','Fri'] : ['Sat','Sun']);
+    const handleClick = () => setSelected((type == 'workdays') ? ['Mon','Tue','Wed','Thu','Fri'].sort() : ['Sat','Sun'].sort());
     return (
         <TouchableOpacity onPress={handleClick}>
-            <_ShortcutPill active={active}>
+            <ShortcutPill active={active}>
                 <Text style={{ color: (active) ? 'white' : '#333', fontSize: 17 }}>
                     { (type == 'workdays') ? 'Dias da Semana' : 'Fim de Semana' }
                 </Text>
-            </_ShortcutPill>
+            </ShortcutPill>
         </TouchableOpacity>
     );
 }
@@ -135,9 +143,9 @@ const WeekdayShortcut = ({ type, selected, setSelected }) => {
 const DayCircle = ({ day, letter, selected, setSelected }) => {
     const handleClick = () => {
         if (selected.includes(day)) {
-            setSelected(selected.filter(x => x !== day));
+            setSelected(selected.filter(x => x !== day).sort());
         } else {
-            setSelected([...selected, day]);
+            setSelected([...selected, day].sort());
         }
     }
 

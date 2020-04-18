@@ -1,13 +1,5 @@
 const express = require("express");
-const mysql = require("mysql");
-
-const con = mysql.createPool({
-    host: "127.0.0.1",
-    user: "root",
-    password: "!@#flavio",
-    database: "dayplanner"
-});
-
+const con = require('./connection'); // mysql connection pool
 const routes = express.Router();
 
 // route to get todayPlans
@@ -31,7 +23,9 @@ routes.get("/plans/today", (request, response) => {
         // day plans query
         con.query(dayPlansQuery, (err, results) => {
             if (err) throw err;
-
+            // evaluate the string 'true' and 'false' on active prop
+            fixedPlans = fixedPlans.map(x => ({ ...x, active: eval(x.active) }))
+            
             let dayPlans = results.filter(row => {
                 // if the todo's category are in the plans list, move the todo to the plan todos and remove from the main todo list
                 if (fixedPlans.map(p => p.nome.toUpperCase()).includes(row.categoria.toUpperCase())) {
@@ -55,12 +49,15 @@ routes.get("/plans/get", (request, response) => {
     const dateQuery = request.query.date.split('/').map(x => Number(x));
     const date = new Date(dateQuery[2], dateQuery[1] - 1, dateQuery[0]);
     const weekday = date.toString().split(' ')[0];
+
     const fixedPlansQuery = `SELECT plans.*, TIME_FORMAT(startHora, "%H:%i") as startHora, TIME_FORMAT(endHora, "%H:%i") as endHora FROM plans WHERE repeatOn LIKE '%${weekday}%' ORDER BY startHora`;
     const dayPlansQuery = "SELECT * FROM todos WHERE data=CURDATE() OR data IS NULL ORDER BY data, startHora";
 
     // fixed plans query
     con.query(fixedPlansQuery, (err, fixedPlans) => {
         if (err) throw err;
+        // evaluate the string 'true' and 'false' on active prop
+        fixedPlans = fixedPlans.map(x => ({ ...x, active: eval(x.active) }))
 
         // day plans query
         con.query(dayPlansQuery, (err, results) => {
@@ -79,6 +76,7 @@ routes.get("/plans/get", (request, response) => {
                     return row;
                 }
             });
+
             response.json({ plans: fixedPlans, todos: dayPlans });
         });
     });

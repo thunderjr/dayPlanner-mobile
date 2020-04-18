@@ -21,7 +21,6 @@ const HeaderBox = styled.View`
 const HeaderText = styled.Text`
     font-size: 32px;
     line-height: 40px;
-    ${props => (props.center) ? 'text-align: center;' : '' }
 `;
 
 const HeaderSubText = styled.Text`
@@ -29,7 +28,7 @@ const HeaderSubText = styled.Text`
     line-height: 40px;
 `;
 
-export const Header = ({ swiperIndex, pages, greetings, navigator }) => {
+export const Header = ({ swiperIndex, pages, greetings, data, navigator }) => {
     // default
     let content = (
         <HeaderBox style={{ paddingLeft: 20 }}>
@@ -38,18 +37,32 @@ export const Header = ({ swiperIndex, pages, greetings, navigator }) => {
         </HeaderBox>
     );
 
+    // main
     if (swiperIndex == 1 && pages.main == 'newPlan') {
         content = (
             <HeaderBox>
-                <HeaderText center={true}>Adicionar Novo Plano</HeaderText>
+                <HeaderText>Adicionar Novo Plano</HeaderText>
             </HeaderBox>
         );
+    } else if (swiperIndex == 1 && pages.main.indexOf('plan') == 0) {
+        try {
+            const planName = data.plans.filter(p => p.id == pages.main.split('-')[1])[0].nome;
+            content = (
+                <HeaderBox>
+                    <HeaderText>{ planName }</HeaderText>
+                </HeaderBox>
+            );
+        } catch (e) {
+            navigator('main', 'list');
+        }
+    // settings
     } else if (swiperIndex == 0 && pages.settings == 'main') {
         content = (
             <HeaderBox>
-                <HeaderText center={true}>Configurações e Atalhos</HeaderText>
+                <HeaderText>Configurações e Atalhos</HeaderText>
             </HeaderBox>
         );
+    // trades
     } else if (swiperIndex == 2) {
         content = (
             <HeaderBox style={{ paddingLeft: 20 }}>

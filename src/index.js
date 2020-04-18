@@ -45,7 +45,9 @@ export default function App() {
             const response = await api.get('/plans/today');
             setTodayData(response.data);
             setTodayPlans(response.data.plans);
-        } catch(e) {}
+        } catch(e) {
+            console.warn("Não foi possível adquirir os dados da API!");
+        }
     }
 
     const settingsActions = {
@@ -59,7 +61,7 @@ export default function App() {
 
     return (<>
         <Container>
-            <Header swiperIndex={swiperIndex} pages={pages} greetings={greetings} navigator={navigator} />
+            <Header swiperIndex={swiperIndex} pages={pages} greetings={greetings} navigator={navigator} data={todayData} />
             <Swiper
                 paginationStyle={{
                     position: 'absolute',
